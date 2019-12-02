@@ -1,56 +1,116 @@
+import 'package:ppg/ppg.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:math';
 
-import 'package:flutter/services.dart';
-import 'package:ppg/ppg.dart';
+const int sampleCount = 100;
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) => const MaterialApp(
+        title: 'PPG Monitor',
+        debugShowCheckedModeBanner: false,
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
+      );
 }
 
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key key, this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<double> data = List<double>.filled(sampleCount, 0);
+  int index = 0;
+  double dataMean = 0, dataMax = 1;
+  final List<StreamSubscription<dynamic>> _streamSubscriptions =
+      <StreamSubscription<dynamic>>[];
+
+  @override
+  Widget build(BuildContext context) {
+    final CustomPaint graph = CustomPaint(
+      painter: PathPainter(
+        data: data,
+        index: index,
+        dataMean: dataMean,
+        dataMax: dataMax,
+      ),
+    );
+    return Scaffold(
+      backgroundColor: Colors.black,
+      // body: SizedBox.expand(child: graph),
+      body: Container(
+        child: graph,
+        width: double.infinity,
+        height: double.infinity,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
+      subscription.cancel();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    _streamSubscriptions.add(ppgEvents.listen(onNewData));
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await Ppg.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+  abs(double i) => i > 0 ? i : -i;
+
+  onNewData(PPGEvent e) {
+    data[index % sampleCount] = e.x;
+    index++;
+
+    if (index % 1000 == 0) {
+      print('dataMean: $dataMean');
+      print('dataMax: $dataMax');
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+    dataMean = 0.99 * dataMean + 0.01 * e.x;
+    absDiff(double i) => dataMean - i > 0 ? dataMean - i : i - dataMean;
+    dataMax = 0.95 * dataMax + 0.05 * data.map(absDiff).reduce(max);
+    setState(() {});
   }
+}
+
+class PathPainter extends CustomPainter {
+  PathPainter({this.data, this.index, this.dataMean, this.dataMax});
+  final int index;
+  final List<double> data;
+  final double dataMean, dataMax;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
-      ),
-    );
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    final Path path = Path()..moveTo(0, size.height / 2);
+
+    for (int i in Iterable<int>.generate(sampleCount)) {
+      final double x = size.width * i / sampleCount;
+      double y = data[(index + i) % sampleCount];
+      y -= dataMean;
+      y /= dataMax;
+      y = size.height * 0.5 * (1 + 0.5 * y);
+      if (i == 0) path.moveTo(x, y);
+      if (i > 0) path.lineTo(x, y);
+    }
+    canvas.drawPath(path, paint);
   }
 }
