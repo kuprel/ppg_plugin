@@ -4,37 +4,39 @@ import 'dart:async';
 import 'dart:math';
 
 const int sampleCount = 100;
+const double initialMean = 5500000;
+const double initialMax = 250000;
 
-void main() => runApp(MyApp());
+void main() => runApp(HeartMonitor());
 
-class MyApp extends StatelessWidget {
+class HeartMonitor extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const MaterialApp(
         title: 'PPG Monitor',
         debugShowCheckedModeBanner: false,
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: Home(title: 'Flutter Demo Home Page'),
       );
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeState extends State<Home> {
   List<double> data = List<double>.filled(sampleCount, 0);
   int index = 0;
-  double dataMean = 0, dataMax = 1;
+  double dataMean = initialMean, dataMax = initialMax;
   final List<StreamSubscription<dynamic>> _streamSubscriptions =
       <StreamSubscription<dynamic>>[];
 
   @override
   Widget build(BuildContext context) {
     final CustomPaint graph = CustomPaint(
-      painter: PathPainter(
+      painter: PulseTrace(
         data: data,
         index: index,
         dataMean: dataMean,
@@ -84,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class PathPainter extends CustomPainter {
-  PathPainter({this.data, this.index, this.dataMean, this.dataMax});
+class PulseTrace extends CustomPainter {
+  PulseTrace({this.data, this.index, this.dataMean, this.dataMax});
   final int index;
   final List<double> data;
   final double dataMean, dataMax;
