@@ -1,7 +1,7 @@
 name: ppg
-description: A plugin to access a PPG sensor on WearOS devices
-version: 0.0.1
-homepage: http://stanford.edu/~kuprel
+description: A plugin to access the PPG sensor on WearOS devices such as Fossil Gen 5 and Fossil Sport
+version: 0.1.0
+homepage: https://github.com/kuprel/ppg_plugin
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
