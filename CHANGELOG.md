@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Added a heart rate stream, but no events are streaming from either of my devices that support this sensor type. Not sure why.
+
 ## 0.1.3
 
 - Only streams events if a ppg sensor is detected

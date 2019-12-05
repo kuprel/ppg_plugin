@@ -26,37 +26,54 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<double> ppgData;
-  double timestamp;
-  bool ppgDetected = false;
-  StreamSubscription<dynamic> _streamSubscription;
+  double hrData;
+  double ppgTimestamp, hrTimestamp;
+  bool ppgDetected = false, hrDetected = false;
+  StreamSubscription<dynamic> _ppgStreamSubscription, _hrStreamSubscription;
 
   @override
   void dispose() {
     super.dispose();
-    _streamSubscription.cancel();
+    _ppgStreamSubscription.cancel();
+    _hrStreamSubscription.cancel();
   }
 
   @override
   void initState() {
     super.initState();
-    _streamSubscription = ppgEvents.listen(onNewData);
+    _ppgStreamSubscription = ppgEvents.listen(onNewPPGData);
+    _hrStreamSubscription = hrEvents.listen(onNewHRData);
   }
 
-  onNewData(PPGEvent e) {
-    timestamp = e.t;
+  onNewPPGData(PPGEvent e) {
+    ppgTimestamp = e.t;
     ppgData = e.x;
     ppgDetected = true;
     setState(() {});
   }
 
+  onNewHRData(HREvent e) {
+    hrTimestamp = e.t;
+    hrData = e.x;
+    hrDetected = true;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String txt = ppgDetected
-        ? '$timestamp\n${ppgData[0]}\n${ppgData[1]}'
+    final String ppgTxt = ppgDetected
+        ? '$ppgTimestamp\n${ppgData[0]}\n${ppgData[1]}'
         : 'PPG not detected';
+    final String hrTxt =
+        hrDetected ? '$hrTimestamp\n$hrData' : 'HR not detected';
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(child: Text(txt, style: TextStyle(color: Colors.white))),
+      body: Center(
+        child: Text(
+          ppgTxt + '\n' * 2 + hrTxt,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 }

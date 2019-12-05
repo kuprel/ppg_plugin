@@ -12,8 +12,10 @@ import android.util.Log;
 
 public class PpgPlugin implements FlutterPlugin {
   private static final String PPG_CHANNEL_NAME = "ppg";
+  private static final String HR_CHANNEL_NAME = "kuprel.hr";
 
   private EventChannel ppgChannel;
+  private EventChannel hrChannel;
 
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
@@ -34,6 +36,10 @@ public class PpgPlugin implements FlutterPlugin {
 
   private void setupEventChannels(Context context, BinaryMessenger messenger) {
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+    hrChannel = new EventChannel(messenger, HR_CHANNEL_NAME);
+    final StreamHandlerImpl hrScopeStreamHandler =
+            new StreamHandlerImpl(sensorManager, Sensor.TYPE_HEART_RATE);
+    hrChannel.setStreamHandler(hrScopeStreamHandler);
     List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
     ppgChannel = new EventChannel(messenger, PPG_CHANNEL_NAME);
     for (Sensor sensor : sensorList) {
@@ -51,5 +57,6 @@ public class PpgPlugin implements FlutterPlugin {
 
   private void teardownEventChannels() {
     ppgChannel.setStreamHandler(null);
+    hrChannel.setStreamHandler(null);
   }
 }
