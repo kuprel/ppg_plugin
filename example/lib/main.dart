@@ -13,7 +13,7 @@ double abs(double x) => x > 0 ? x : -x;
 class HeartMonitor extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'PPG Monitor',
+        title: 'PPG Example',
         debugShowCheckedModeBanner: false,
         home: Home(),
       );
@@ -27,6 +27,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<double> ppgData;
   double timestamp;
+  bool ppgDetected = false;
   StreamSubscription<dynamic> _streamSubscription;
 
   @override
@@ -44,17 +45,18 @@ class _HomeState extends State<Home> {
   onNewData(PPGEvent e) {
     timestamp = e.t;
     ppgData = e.x;
+    ppgDetected = true;
     setState(() {});
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            '$timestamp\n${ppgData[0]}\n${ppgData[1]}',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final String txt = ppgDetected
+        ? '$timestamp\n${ppgData[0]}\n${ppgData[1]}'
+        : 'PPG not detected';
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(child: Text(txt, style: TextStyle(color: Colors.white))),
+    );
+  }
 }

@@ -36,19 +36,17 @@ public class PpgPlugin implements FlutterPlugin {
     SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     List<Sensor> sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL);
     ppgChannel = new EventChannel(messenger, PPG_CHANNEL_NAME);
-    int ppgSensorType = Sensor.TYPE_ACCELEROMETER;
     for (Sensor sensor : sensorList) {
       String sensorName = sensor.getStringType().toLowerCase();
       Log.d("sensorFound", sensorName + ":" + sensor.getType());
       if (sensorName.contains("ppg")) {
-        ppgSensorType = sensor.getType();
+        int ppgSensorType = sensor.getType();
         Log.d("ppgSensorFound", sensorName + ":" + ppgSensorType);
+        final StreamHandlerImpl ppgScopeStreamHandler =
+                new StreamHandlerImpl(sensorManager, ppgSensorType);
+        ppgChannel.setStreamHandler(ppgScopeStreamHandler);
       }
     }
-    final StreamHandlerImpl ppgScopeStreamHandler =
-            new StreamHandlerImpl(sensorManager, ppgSensorType);
-    ppgChannel.setStreamHandler(ppgScopeStreamHandler);
-
   }
 
   private void teardownEventChannels() {
