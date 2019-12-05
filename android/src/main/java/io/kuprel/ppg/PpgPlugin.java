@@ -40,7 +40,7 @@ public class PpgPlugin implements FlutterPlugin {
     for (Sensor sensor : sensorList) {
       String sensorName = sensor.getStringType().toLowerCase();
       Log.d("sensorFound", sensorName + ":" + sensor.getType());
-      if (sensorName.contains("ppg") || sensorName.contains("bio_hrm")) {
+      if (sensorName.contains("ppg")) {
         ppgSensorType = sensor.getType();
         Log.d("ppgSensorFound", sensorName + ":" + ppgSensorType);
       }

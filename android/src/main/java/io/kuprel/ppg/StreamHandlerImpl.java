@@ -14,7 +14,7 @@ class StreamHandlerImpl implements EventChannel.StreamHandler {
 
   StreamHandlerImpl(SensorManager sensorManager, int sensorType) {
     this.sensorManager = sensorManager;
-    sensor = sensorManager.getDefaultSensor(sensorType);
+    sensor = sensorManager.getDefaultSensor(sensorType, true);
   }
 
   @Override

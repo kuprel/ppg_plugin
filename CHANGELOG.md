@@ -1,3 +1,3 @@
-## 0.0.1
+## 0.1.2
 
-* TODO: Describe initial release.
+- Set wakeUp to true in sensorManager.getDefaultSensor, increased minSdkVersion to 21
