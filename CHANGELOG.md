@@ -1,3 +1,7 @@
+## 0.1.5
+
+- Heart rate stream works now, required BODY_SENSORS permission
+
 ## 0.1.4
 
 - Added a heart rate stream, but no events are streaming from either of my devices that support this sensor type. Not sure why.

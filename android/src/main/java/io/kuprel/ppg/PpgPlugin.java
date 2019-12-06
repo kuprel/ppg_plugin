@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class PpgPlugin implements FlutterPlugin {
   private static final String PPG_CHANNEL_NAME = "ppg";
-  private static final String HR_CHANNEL_NAME = "kuprel.hr";
+  private static final String HR_CHANNEL_NAME = "hr";
 
   private EventChannel ppgChannel;
   private EventChannel hrChannel;
@@ -45,7 +45,7 @@ public class PpgPlugin implements FlutterPlugin {
     for (Sensor sensor : sensorList) {
       String sensorName = sensor.getStringType().toLowerCase();
       Log.d("sensorFound", sensorName + ":" + sensor.getType());
-      if (sensorName.contains("ppg")) {
+      if (sensorName.contains("ppg") || sensorName.contains("bio_hrm")) {
         int ppgSensorType = sensor.getType();
         Log.d("ppgSensorFound", sensorName + ":" + ppgSensorType);
         final StreamHandlerImpl ppgScopeStreamHandler =

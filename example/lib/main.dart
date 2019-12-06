@@ -1,77 +1,71 @@
-import 'dart:async';
-import 'package:ppg/ppg.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'app_state.dart';
 
-const int storeCount = 1024;
-const double displayBeatCount = 2.5;
-const double peakWindowMillis = 50;
+void main() {
+  final AppState state = AppState();
 
-void main() => runApp(HeartMonitor());
+  final MaterialApp app = MaterialApp(
+    title: 'PPG Example',
+    debugShowCheckedModeBanner: false,
+    home: ScopedModel<AppState>(model: state, child: PPGExample()),
+  );
 
-double abs(double x) => x > 0 ? x : -x;
+  runApp(app);
 
-class HeartMonitor extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'PPG Example',
-        debugShowCheckedModeBanner: false,
-        home: Home(),
-      );
+  state.initPPG();
+
+  handlePermissionResponse(Map<PermissionGroup, PermissionStatus> status) {
+    if (status[PermissionGroup.sensors] == PermissionStatus.granted) {
+      state.initHR();
+    }
+  }
+
+  handlePermissionStatus(PermissionStatus status) => status ==
+          PermissionStatus.granted
+      ? state.initHR()
+      : PermissionHandler()
+          .requestPermissions(<PermissionGroup>[PermissionGroup.sensors]).then(
+              handlePermissionResponse);
+
+  PermissionHandler()
+      .checkPermissionStatus(PermissionGroup.sensors)
+      .then(handlePermissionStatus);
 }
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  List<double> ppgData;
-  double hrData;
-  double ppgTimestamp, hrTimestamp;
-  bool ppgDetected = false, hrDetected = false;
-  StreamSubscription<dynamic> _ppgStreamSubscription, _hrStreamSubscription;
-
-  @override
-  void dispose() {
-    super.dispose();
-    _ppgStreamSubscription.cancel();
-    _hrStreamSubscription.cancel();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _ppgStreamSubscription = ppgEvents.listen(onNewPPGData);
-    _hrStreamSubscription = hrEvents.listen(onNewHRData);
-  }
-
-  onNewPPGData(PPGEvent e) {
-    ppgTimestamp = e.t;
-    ppgData = e.x;
-    ppgDetected = true;
-    setState(() {});
-  }
-
-  onNewHRData(HREvent e) {
-    hrTimestamp = e.t;
-    hrData = e.x;
-    hrDetected = true;
-    setState(() {});
-  }
-
+class PPGExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final String ppgTxt = ppgDetected
-        ? '$ppgTimestamp\n${ppgData[0]}\n${ppgData[1]}'
+    final AppState state = ScopedModel.of<AppState>(
+      context,
+      rebuildOnChange: true,
+    );
+
+    final String ppgTxt = state.ppgDetected
+        ? 'Channel 1: ${state.ppgData[0]}\n'
+            'Channel 2: ${state.ppgData[1]}\n'
+            'timestamp: ${state.ppgTimestamp.round()}'
         : 'PPG not detected';
-    final String hrTxt =
-        hrDetected ? '$hrTimestamp\n$hrData' : 'HR not detected';
+
+    final String hrTxt = !state.hrPermission
+        ? 'Permission not granted'
+        : !state.hrDetected
+            ? 'Reading...'
+            : '${state.hrData.round()} bpm\n'
+                'timestamp: ${state.hrTimestamp.round()}';
+
+    final String txt = 'PPG\n$ppgTxt\n\nHeart Rate\n$hrTxt';
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
+      body: Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 8),
         child: Text(
-          ppgTxt + '\n' * 2 + hrTxt,
+          txt,
           style: TextStyle(color: Colors.white),
+          textAlign: TextAlign.left,
         ),
       ),
     );

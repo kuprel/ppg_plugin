@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 const EventChannel _ppgEventChannel = EventChannel('ppg');
-const EventChannel _hrEventChannel = EventChannel('kuprel.hr');
+const EventChannel _hrEventChannel = EventChannel('hr');
 
 class PPGEvent {
   PPGEvent(this.x, this.t);
