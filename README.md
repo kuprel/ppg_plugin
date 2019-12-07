@@ -27,7 +27,12 @@ import 'package:ppg/ppg.dart';
 ppgEvents.listen((PPGEvent event) {
   print(event);
 });
-// [PPGEvent (x: [0.0, 0.0] t: 0.0)]
+// [PPGEvent (x: [0.0, 0.0], t: 0.0)]
+
+hrEvents.listen((HREvent event) {
+  print(event);
+});
+// [HREvent (x: 0.0, t: 0.0)]
 
 ```
 

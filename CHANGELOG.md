@@ -1,3 +1,7 @@
+## 0.1.7
+
+- Updated README
+
 ## 0.1.5
 
 - Heart rate stream works now, required BODY_SENSORS permission
