@@ -42,18 +42,20 @@ class PPGExample extends StatelessWidget {
       rebuildOnChange: true,
     );
 
-    final String ppgTxt = state.ppgDetected
-        ? 'Channel 1: ${state.ppgData[0]}\n'
+    final String ppgTxt = !state.ppgDetected
+        ? 'PPG not detected'
+        : 'Channel 1: ${state.ppgData[0]}\n'
             'Channel 2: ${state.ppgData[1]}\n'
-            'timestamp: ${state.ppgTimestamp.round()}'
-        : 'PPG not detected';
+            'timestamp: ${state.ppgTimestamp.round()}\n'
+            'accuracy: ${state.ppgAccuracy}';
 
     final String hrTxt = !state.hrPermission
         ? 'Permission not granted'
         : !state.hrDetected
             ? 'Reading...'
             : '${state.hrData.round()} bpm\n'
-                'timestamp: ${state.hrTimestamp.round()}';
+                'timestamp: ${state.hrTimestamp.round()}\n'
+                'accuracy: ${state.hrAccuracy}';
 
     final String txt = 'PPG\n$ppgTxt\n\nHeart Rate\n$hrTxt';
 

@@ -17,7 +17,7 @@ Update: I used this plugin to make a simple heart monitoring app
 
 ## Usage
 
-This plugin exposes a `Stream` of `PPGEvent`s
+This plugin exposes `Stream`s of `PPGEvent`s and `HREvent`s
 
 ### Example
 

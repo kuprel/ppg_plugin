@@ -1,6 +1,6 @@
 name: ppg
-description: A plugin to access the PPG sensor on WearOS devices.  Tested to work with Fossil Gen 5 and Fossil Sport.
-version: 0.1.7
+description: A plugin to access the PPG sensor and estimated heart rate on WearOS devices.
+version: 0.1.8
 homepage: https://github.com/kuprel/ppg_plugin
 
 environment:

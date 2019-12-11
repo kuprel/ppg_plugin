@@ -5,6 +5,7 @@ class AppState extends Model {
   bool ppgDetected = false, hrDetected = false, hrPermission = false;
   List<double> ppgData;
   double hrData, ppgTimestamp, hrTimestamp;
+  int hrAccuracy, ppgAccuracy;
 
   initPPG() => ppgEvents.listen(onNewPPGData);
 

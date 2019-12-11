@@ -1,3 +1,7 @@
+## 0.1.8
+
+- Added `accuracy` field to `PPGEvent` and `HREvent`
+
 ## 0.1.7
 
 - Updated README
